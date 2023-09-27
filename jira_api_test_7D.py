@@ -13,7 +13,7 @@ def safe_str(obj):
 jira = Jira(
     url='https://defenestrate.atlassian.net',
     username='verdict.zero@gmail.com',
-    password='ATATT3xFfGF0mlrNZNButIwlwlR5A7FAf0nDyRFDlAoU5qHe1ORP9fqMLDu7Bh3YP9MI1-PSJZyAHmFT1Sv7-PqTXvajyURo14R2nQgk-V0ajK44RtLyhmEEgfEj0mgKYEXtnpKQOafO3nsoBWKToqE97uzwaPq55FTGqRNJMjVQuzUf3dIivOQ=5986C7DA'
+    password='TOKEN'
 )
 
 # Get user input
