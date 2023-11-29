@@ -9,9 +9,9 @@ def safe_str(obj):
         # Encode the string to 'ascii', replacing problematic characters with 'X'
         return obj.encode('ascii', 'replace').decode('ascii')
 
-url_user_set = input("").strip()
-username_user_set = input("").strip()
-password_user_set = input("").strip()
+url_user_set = input("Enter your Jira username:").strip()
+username_user_set = input("Enter your Jira instance URL:").strip()
+password_user_set = input("Enter your Jira private key:").strip()
 
 # Initialize Jira connection
 jira = Jira(
