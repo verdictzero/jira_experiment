@@ -57,7 +57,7 @@ def run_script():
             output_text.insert(tk.END,issue['key'], issue['fields']['summary'])
         except Exception as e:
             # If the issue does not exist or any other error occurs, print an error message
-            output_text.insert(tk.END,f"Could not fetch issue {issue_key}. Error: {e}")
+            output_text.insert(tk.END,f"Could not fetch issue {issue_key}. Error: {e}\n")
 
     # Create a datetime stamped filename
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
