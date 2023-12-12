@@ -3,7 +3,7 @@ from atlassian import Jira
 jira = Jira(
     url='https://defenestrate.atlassian.net',
     username='verdict.zero@gmail.com',
-    password='ATATT3xFfGF0RJRtazGOAYhBTV6utKJ3dxe8zWxgsUYgziNrLDpaqXGCu-2soOyxfMOgDu774CyRQfTk-WWTa7CyCdtIaKP8XmzGs57AEo67uW5xHI64b3bc1-H2Vdm51AlpC34W4Grd9wlGQYzO0Zpv-jlTyC7ovVmPqLP6HVsA3GsNS_dnXSA=B38CE11C'
+    password='ATATT3xFfGF0VSswmLTnQJI3HDXHez682B5gJIwhIua3PvrifcjCSQpGk5EXkmHYAkTXMcOfkd6FBlJvb8WetpFpO7FzfbEHmoLs2yCX-ltmT4jc9gsqHK7Tk4CDxdeyI0bjwqWhhWYYCJwzN87Q75_fN1HEk2JR-Uc0KeW5yvw5BllgLRZGflk=EC09E314'
     )
 
 # Get user input
