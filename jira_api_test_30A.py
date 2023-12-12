@@ -4,6 +4,7 @@ from atlassian import Jira
 from atlassian import utils
 import pip_system_certs.wrapt_requests
 import argparse
+import requests
 import traceback2 as traceback
 
 def safe_str(obj):
