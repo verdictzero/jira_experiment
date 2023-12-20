@@ -9,3 +9,6 @@ At line:1 char:48
 # Open a new PowerShell window and run the script with the provided arguments
 powershell_command = ' '.join(['powershell', '-NoExit', '-File'] + cmd)
 subprocess.Popen(["powershell", "-Command", powershell_command])
+
+
+Processing -File 'C:\Program' failed because the file does not have a '.ps1' extension. Specify a valid Windows PowerShell script file name, and then try again.
