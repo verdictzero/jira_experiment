@@ -1,0 +1,6 @@
+Start-Process : A parameter cannot be found that matches parameter name 'Command'.
+At line:1 char:48
++ Start-Process powershell -ArgumentList -NoExit -Command C:\Program Fi ...
++                                                ~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Start-Process], ParameterBindingException
+    + FullyQualifiedErrorId : NamedParameterNotFound,Microsoft.PowerShell.Commands.StartProcessCommand
