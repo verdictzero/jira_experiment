@@ -4,3 +4,8 @@ At line:1 char:48
 +                                                ~~~~~~~~
     + CategoryInfo          : InvalidArgument: (:) [Start-Process], ParameterBindingException
     + FullyQualifiedErrorId : NamedParameterNotFound,Microsoft.PowerShell.Commands.StartProcessCommand
+
+
+# Open a new PowerShell window and run the script with the provided arguments
+powershell_command = ' '.join(['powershell', '-NoExit', '-File'] + cmd)
+subprocess.Popen(["powershell", "-Command", powershell_command])
