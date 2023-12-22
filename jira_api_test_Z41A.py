@@ -6,6 +6,7 @@ import pip_system_certs.wrapt_requests
 import argparse
 import requests
 import traceback2 as traceback
+import re
 
 # ATATT3xFfGF0WlzTEcU8ZRxTjgeKVquwSC4A5eH9o1nT7g4NpWtUiXjFhvZvQMC8larABCHEpx9g1uZ3j60Gu1JLMknzBb-NAjc_hpl8Okp52Ni7JqYfigbY7r2Yd3fOV_9xReOfhuZfk5aN1jVvZaoVcYWIkGAkuzrZF0WLPptwqIkLSijq1iE=A4BB6614
 
@@ -15,6 +16,14 @@ def safe_str(obj):
     except UnicodeEncodeError:
         # Encode the string to 'ascii', replacing problematic characters with 'X'
         return obj.encode('ascii', 'replace').decode('ascii')
+
+def convert_time_to_seconds(time_str):
+    time_units = {'w': 604800, 'd': 86400, 'h': 3600, 'm': 60, 's': 1}
+    total_seconds = 0
+    parts = re.findall(r'(\d+)([wdhms])', time_str)
+    for amount, unit in parts:
+        total_seconds += int(amount) * time_units[unit]
+    return total_seconds
 
 # Create an ArgumentParser object
 parser = argparse.ArgumentParser(description='Script to connect to Jira, process a range of tickets, and output to a CSV file.')
@@ -42,8 +51,31 @@ print(f"Debug: End Range = {args.end_range}")
 jira = Jira(
     url=args.url,
     username=args.username,
-    password=args.token #change this back to token when working with SE2
+    password=args.token
 )
+
+# Define the JQL query
+jql_query = f'project = {args.project_key} ORDER BY created DESC'
+
+# Fetch the latest ticket using JQL
+try:
+    tickets = jira.jql(jql_query, limit=1)['issues']
+    if tickets:
+        last_ticket = tickets[0]
+        print(f"Last ticket key: {last_ticket['key']}")
+
+        # Extracting the numeric part from the ticket key
+        match = re.search(r'\d+$', last_ticket['key'])
+        if match:
+            maximum_upper_limit = int(match.group())
+            print(f"Maximum upper limit (integer): {maximum_upper_limit}")
+        else:
+            print("No numeric part found in the ticket key.")
+    else:
+        print("No tickets found in the project.")
+except Exception as e:
+    print(f"Error fetching tickets: {e}")
+    traceback.print_exc()
 
 # Use the arguments
 project_key = args.project_key
@@ -71,9 +103,8 @@ filename = f'jira_data_{current_time}.csv'
 # Prepare CSV file for writing
 with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
-    csv_writer.writerow(['Issue Key', 'Summary', 'Status', 'Worklog Comment', 'Author', 'Time Spent', 'Worklog Created', 'Data Extracted Time'])
+    csv_writer.writerow(['Issue Key', 'Summary', 'Status', 'Worklog Comment', 'Author', 'Time Spent', 'Time Spent Converted', 'Worklog Created', 'Data Extracted Time'])
 
-    # Loop through the fetched issues to extract work logs and write to CSV
     for issue in issues_list:
         issue_key = issue['key']
         summary = issue['fields']['summary']
@@ -91,8 +122,9 @@ with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
                 worklog_created = worklog['started']
                 
                 # Write to CSV, using safe_str for each string field
-                csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), safe_str(comment), safe_str(author_name), safe_str(time_spent), safe_str(worklog_created), safe_str(extraction_time)])
+                time_spent_seconds = convert_time_to_seconds(time_spent)
+                csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), safe_str(comment), safe_str(author_name), safe_str(time_spent), time_spent_seconds, safe_str(worklog_created), safe_str(extraction_time)])
         else:
-            csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), 'No work records found.', '', '', '', safe_str(extraction_time)])
+            csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), 'No work records found.', '', '', 0, '', safe_str(extraction_time)])
 
 print(f"Data written to {filename}")
