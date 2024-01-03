@@ -22,10 +22,10 @@ root.title("Jira Ticket Processor")
 # Default values
 default_url = "https://defenestrate.atlassian.net"
 default_username = "verdict.zero@gmail.com"
-default_token = "ATATT3xFfGF0WlzTEcU8ZRxTjgeKVquwSC4A5eH9o1nT7g4NpWtUiXjFhvZvQMC8larABCHEpx9g1uZ3j60Gu1JLMknzBb-NAjc_hpl8Okp52Ni7JqYfigbY7r2Yd3fOV_9xReOfhuZfk5aN1jVvZaoVcYWIkGAkuzrZF0WLPptwqIkLSijq1iE=A4BB6614"
+default_token = "your_token"
 default_project_key = "TEST"
-default_start_range = "110"
-default_end_range = "120"
+default_start_range = "0"
+default_end_range = "0"
 
 tk.Label(root, text="Jira URL:").pack()
 url_entry = tk.Entry(root)
