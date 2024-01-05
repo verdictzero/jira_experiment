@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
-import jira_script  # Ensure this is in the same directory
+import jdeu_logic_module  # Ensure this is in the same directory
 
 def handle_button_click():
     try:
@@ -11,13 +11,14 @@ def handle_button_click():
         start_range = int(start_range_entry.get())
         end_range = int(end_range_entry.get())
 
-        filename = jira_script.process_tickets(url, username, token, project_key, start_range, end_range)
+        filename = jdeu_logic_module.process_tickets(url, username, token, project_key, start_range, end_range)
         messagebox.showinfo("Success", f"Data written to {filename}")
     except Exception as e:
         messagebox.showerror("Error", str(e))
 
 root = tk.Tk()
-root.title("Jira Ticket Processor")
+root.title("Jira Data Extraction Utility")
+root.geometry("500x300")
 
 # Default values
 default_url = "https://defenestrate.atlassian.net"

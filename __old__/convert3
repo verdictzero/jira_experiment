@@ -1,1 +1,0 @@
-=INT(A1/(7*24*60*60)) & " weeks " & INT(MOD(A1,(7*24*60*60))/(24*60*60)) & " days " & INT(MOD(A1,(24*60*60))/(60*60)) & " hours " & INT(MOD(A1,(60*60))/60) & " minutes " & MOD(A1,60) & " seconds"
