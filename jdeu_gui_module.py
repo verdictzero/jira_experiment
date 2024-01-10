@@ -4,6 +4,12 @@ import jdeu_logic_module  # Ensure this is in the same directory
 
 def handle_button_click():
     try:
+        # Disable the button
+        process_button.config(state=tk.DISABLED)
+
+        # Update warning message
+        warning_label.config(text="DO NOT CLOSE THIS WINDOW\nTHIS MAY TAKE A WHILE\nSEE CONSOLE FOR PROCESS OUTPUT", fg="red")
+
         url = url_entry.get()
         username = username_entry.get()
         token = token_entry.get()
@@ -13,8 +19,15 @@ def handle_button_click():
 
         filename = jdeu_logic_module.process_tickets(url, username, token, project_key, start_range, end_range)
         messagebox.showinfo("Success", f"Data written to {filename}")
+
+        # Enable the button and clear the warning message after processing
+        process_button.config(state=tk.NORMAL)
+        warning_label.config(text="")
+
     except Exception as e:
         messagebox.showerror("Error", str(e))
+        process_button.config(state=tk.NORMAL)
+        warning_label.config(text="")
 
 root = tk.Tk()
 root.title("Jira Data Extraction Utility")
@@ -60,5 +73,9 @@ end_range_entry.pack()
 
 process_button = tk.Button(root, text="Process Tickets", command=handle_button_click)
 process_button.pack()
+
+# Label for warning message
+warning_label = tk.Label(root, text="", font=("Helvetica", 10, "bold"))
+warning_label.pack()
 
 root.mainloop()

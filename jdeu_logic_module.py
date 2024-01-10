@@ -51,7 +51,8 @@ def fetch_issues(jira, project_key, start_range, end_range):
 def write_issues_to_csv(jira, issues_list, filename):
     with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(['Issue Key', 'Summary', 'Status', 'Worklog Comment', 'Author', 'Time Spent', 'Time Spent Converted', 'Worklog Created', 'Data Extracted Time'])
+        # Adding new headers for work hours, days, weeks, years, and inactive status
+        csv_writer.writerow(['Issue Key', 'Summary', 'Status', 'Worklog Comment', 'Author', 'Time Spent', 'Time Spent Converted', 'Work Hours', 'Work Days', 'Work Weeks', 'Work Years', 'Inactive', 'Worklog Created', 'Data Extracted Time'])
 
         for issue in issues_list:
             issue_key = issue['key']
@@ -70,9 +71,16 @@ def write_issues_to_csv(jira, issues_list, filename):
                     worklog_created = worklog['started']
 
                     time_spent_seconds = convert_time_to_seconds(time_spent)
-                    csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), safe_str(comment), safe_str(author_name), safe_str(time_spent), time_spent_seconds, safe_str(worklog_created), safe_str(extraction_time)])
+                    time_spent_hours = time_spent_seconds / 3600
+                    time_spent_days = time_spent_seconds / (3600 * 24)
+                    time_spent_weeks = time_spent_seconds / (3600 * 24 * 7)
+                    time_spent_years = time_spent_seconds / (3600 * 24 * 365)
+
+                    inactive = "Yes" if "[X]" in author_name else "No"
+
+                    csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), safe_str(comment), safe_str(author_name), safe_str(time_spent), time_spent_seconds, time_spent_hours, time_spent_days, time_spent_weeks, time_spent_years, inactive, safe_str(worklog_created), safe_str(extraction_time)])
             else:
-                csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), 'No work records found.', '', '', 0, '', safe_str(extraction_time)])
+                csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), 'No work records found.', '', '', 0, 0, 0, 0, 0, 'No', '', safe_str(extraction_time)])
 
 def process_tickets(url, username, token, project_key, start_range, end_range):
     jira = initialize_jira_connection(url, username, token)
