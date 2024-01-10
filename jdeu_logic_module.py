@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from atlassian import Jira
 import traceback2 as traceback
+from colorama import Fore, Style, init
 
 def safe_str(obj):
     try:
@@ -99,7 +100,17 @@ def process_tickets(url, username, token, project_key, start_range, end_range):
     issues_list = fetch_issues(jira, project_key, start_range, end_range)
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = f'jira_data_{current_time}.csv'
+    
+    # Initialize colorama
+    init()
+
+    # Print bold red text
+    print(Style.BRIGHT + Fore.GREEN + f"[ Creating {filename} ]")
+    print(Style.BRIGHT + Fore.RED + "[ !!! THIS IS GOING TO TAKE A WHILE !!! ]" + Style.RESET_ALL)
+    print(Style.BRIGHT + Fore.RED + "[ !!! -- DO NOT CLOSE THIS WINDOW -- !!! ]" + Style.RESET_ALL)
+    
     write_issues_to_csv(jira, issues_list, filename)
+
     print(f"Data written to {filename}")
 
     return filename
