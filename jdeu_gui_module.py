@@ -21,10 +21,10 @@ root.title("Jira Data Extraction Utility")
 root.geometry("500x300")
 
 # Default values
-default_url = "https://defenestrate.atlassian.net"
-default_username = "verdict.zero@gmail.com"
-default_token = "your_token"
-default_project_key = "TEST"
+default_url = "https://jira.se2.army.mil"
+default_username = "evan.snyder"
+default_token = "Nzk3OTY3OTg1NDAxOpS7hLb+j3Y7qnP40Y0WPHOCHyZH"
+default_project_key = "DCGSAV32"
 default_start_range = "0"
 default_end_range = "0"
 

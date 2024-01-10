@@ -19,7 +19,7 @@ def convert_time_to_seconds(time_str):
     return total_seconds
 
 def initialize_jira_connection(url, username, token):
-    return Jira(url=url, username=username, password=token)  # !! IMPORTANT !! --- change to token=token when using with SE2
+    return Jira(url=url, username=username, token=token)  # !! IMPORTANT !! --- change to token=token when using with SE2 --- (and password=token for Jira Cloud)
 
 def fetch_latest_ticket(jira, project_key):
     jql_query = f'project = {project_key} ORDER BY created DESC'
