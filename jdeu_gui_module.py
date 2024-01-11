@@ -16,7 +16,7 @@ def process_tickets_thread(url, username, token, project_key, start_range, end_r
 
 def handle_button_click():
     # Disable the button
-    process_button.config(state=tk.DISABLED)
+    process_button.config(state=tk.DISABLED) # [ !! - Note: if you comment this out, you can launch multiple threads, and bad things can happen, don't do that. - !! ]
 
     # Update warning message
     warning_label.config(text="DO NOT CLOSE THIS WINDOW\nTHIS MAY TAKE A WHILE\nSEE CONSOLE FOR PROCESS OUTPUT", fg="red")

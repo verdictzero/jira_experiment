@@ -5,6 +5,9 @@ from atlassian import Jira
 import traceback2 as traceback
 from colorama import Fore, Style, init
 
+# Initialize colorama
+init()
+
 def safe_str(obj):
     try:
         return str(obj)
@@ -29,10 +32,10 @@ def fetch_latest_ticket(jira, project_key):
         if tickets:
             return tickets[0]
         else:
-            print("No tickets found in the project.")
+            print(Style.BRIGHT + Fore.YELLOW + "No tickets found in the project." + Style.RESET_ALL)
             return None
     except Exception as e:
-        print(f"Error fetching tickets: {e}")
+        print(Style.BRIGHT + Fore.RED + f"Error fetching tickets: {e}" + Style.RESET_ALL)
         traceback.print_exc()
         return None
 
@@ -45,7 +48,7 @@ def fetch_issues(jira, project_key, start_range, end_range):
             issues_list.append(issue)
             print(issue['key'], issue['fields']['summary'])
         except Exception as e:
-            print(f"Could not fetch issue {issue_key}. Error: {e}")
+            print(Style.BRIGHT + Fore.YELLOW + f"Could not fetch issue {issue_key}. Error: {e}" + Style.RESET_ALL)
             # traceback.print_exc()
     return issues_list
 
@@ -100,9 +103,6 @@ def process_tickets(url, username, token, project_key, start_range, end_range):
     issues_list = fetch_issues(jira, project_key, start_range, end_range)
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = f'jira_data_{current_time}.csv'
-    
-    # Initialize colorama
-    init()
 
     # Print bold red text
     print(Style.BRIGHT + Fore.GREEN + f"[ Creating {filename} ]")
