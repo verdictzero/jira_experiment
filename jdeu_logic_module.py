@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from atlassian import Jira
 import traceback2 as traceback
+from colorama import Fore, Style, init
 
 def safe_str(obj):
     try:
@@ -19,7 +20,7 @@ def convert_time_to_seconds(time_str):
     return total_seconds
 
 def initialize_jira_connection(url, username, token):
-    return Jira(url=url, username=username, password=token)  # !! IMPORTANT !! --- change to token=token when using with SE2
+    return Jira(url=url, username=username, token=token)  # !! IMPORTANT !! --- change to token=token when using with SE2 --- (and password=token for Jira Cloud)
 
 def fetch_latest_ticket(jira, project_key):
     jql_query = f'project = {project_key} ORDER BY created DESC'
@@ -51,7 +52,8 @@ def fetch_issues(jira, project_key, start_range, end_range):
 def write_issues_to_csv(jira, issues_list, filename):
     with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
         csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(['Issue Key', 'Summary', 'Status', 'Worklog Comment', 'Author', 'Time Spent', 'Time Spent Converted', 'Worklog Created', 'Data Extracted Time'])
+        # Adding new headers for work hours, days, weeks, years, and inactive status
+        csv_writer.writerow(['Issue Key', 'Summary', 'Status', 'Worklog Comment', 'Author', 'Time Spent', 'Time Spent Converted', 'Work Hours', 'Work Days', 'Work Weeks', 'Work Years', 'Inactive', 'Worklog Created', 'Data Extracted Time'])
 
         for issue in issues_list:
             issue_key = issue['key']
@@ -70,9 +72,16 @@ def write_issues_to_csv(jira, issues_list, filename):
                     worklog_created = worklog['started']
 
                     time_spent_seconds = convert_time_to_seconds(time_spent)
-                    csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), safe_str(comment), safe_str(author_name), safe_str(time_spent), time_spent_seconds, safe_str(worklog_created), safe_str(extraction_time)])
+                    time_spent_hours = time_spent_seconds / 3600
+                    time_spent_days = time_spent_seconds / (3600 * 24)
+                    time_spent_weeks = time_spent_seconds / (3600 * 24 * 7)
+                    time_spent_years = time_spent_seconds / (3600 * 24 * 365)
+
+                    inactive = "Yes" if "[X]" in author_name else "No"
+
+                    csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), safe_str(comment), safe_str(author_name), safe_str(time_spent), time_spent_seconds, time_spent_hours, time_spent_days, time_spent_weeks, time_spent_years, inactive, safe_str(worklog_created), safe_str(extraction_time)])
             else:
-                csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), 'No work records found.', '', '', 0, '', safe_str(extraction_time)])
+                csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), 'No work records found.', '', '', 0, 0, 0, 0, 0, 'No', '', safe_str(extraction_time)])
 
 def process_tickets(url, username, token, project_key, start_range, end_range):
     jira = initialize_jira_connection(url, username, token)
@@ -91,7 +100,17 @@ def process_tickets(url, username, token, project_key, start_range, end_range):
     issues_list = fetch_issues(jira, project_key, start_range, end_range)
     current_time = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = f'jira_data_{current_time}.csv'
+    
+    # Initialize colorama
+    init()
+
+    # Print bold red text
+    print(Style.BRIGHT + Fore.GREEN + f"[ Creating {filename} ]")
+    print(Style.BRIGHT + Fore.RED + "[ !!! THIS IS GOING TO TAKE A WHILE !!! ]" + Style.RESET_ALL)
+    print(Style.BRIGHT + Fore.RED + "[ !!! -- DO NOT CLOSE THIS WINDOW -- !!! ]" + Style.RESET_ALL)
+    
     write_issues_to_csv(jira, issues_list, filename)
+
     print(f"Data written to {filename}")
 
     return filename
