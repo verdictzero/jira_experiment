@@ -13,9 +13,19 @@ def safe_str(obj):
         return str(obj)
     except UnicodeEncodeError:
         return obj.encode('ascii', 'replace').decode('ascii')
-
+'''
 def convert_time_to_seconds(time_str):
     time_units = {'w': 604800, 'd': 86400, 'h': 3600, 'm': 60, 's': 1}
+    total_seconds = 0
+    parts = re.findall(r'(\d+)([wdhms])', time_str)
+    for amount, unit in parts:
+        total_seconds += int(amount) * time_units[unit]
+    return total_seconds
+'''
+
+def convert_time_to_seconds(time_str):
+    # A work day is 8 hours and a work week is 5 days
+    time_units = {'w': 5 * 8 * 3600, 'd': 8 * 3600, 'h': 3600, 'm': 60, 's': 1}
     total_seconds = 0
     parts = re.findall(r'(\d+)([wdhms])', time_str)
     for amount, unit in parts:
@@ -56,7 +66,7 @@ def write_issues_to_csv(jira, issues_list, filename):
     with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
         csv_writer = csv.writer(csvfile)
         # Adding new headers for work hours, days, weeks, years, and inactive status
-        csv_writer.writerow(['Issue Key', 'Summary', 'Status', 'Worklog Comment', 'Author', 'Time Spent', 'Time Spent Converted', 'Work Hours', 'Work Days', 'Work Weeks', 'Work Years', 'Inactive', 'Worklog Created', 'Data Extracted Time'])
+        csv_writer.writerow(['Issue Key', 'Summary', 'Status', 'Worklog Comment', 'Author', 'Time Spent', 'Time Spent Converted', 'Work Hours', 'Work Days', 'Work Weeks', 'Work Months', 'Work Years', 'Inactive', 'Worklog Created', 'Data Extracted Time'])
 
         for issue in issues_list:
             issue_key = issue['key']
@@ -67,26 +77,29 @@ def write_issues_to_csv(jira, issues_list, filename):
             worklogs = worklogs_response.get('worklogs', [])
             extraction_time = datetime.now().isoformat()
 
-            if worklogs:
-                for worklog in worklogs:
-                    comment = worklog.get('comment', "No comment provided.")
-                    author_name = worklog['author']['displayName']
-                    time_spent = worklog['timeSpent']
-                    worklog_created = worklog['started']
+        if worklogs:
+            for worklog in worklogs:
+                comment = worklog.get('comment', "No comment provided.")
+                author_name = worklog['author']['displayName']
+                time_spent = worklog['timeSpent']
+                worklog_created = worklog['started']
 
-                    time_spent_seconds = convert_time_to_seconds(time_spent)
-                    time_spent_hours = time_spent_seconds / 3600
-                    time_spent_days = time_spent_seconds / (3600 * 24)
-                    time_spent_weeks = time_spent_seconds / (3600 * 24 * 7)
-                    time_spent_years = time_spent_seconds / (3600 * 24 * 365)
+                time_spent_seconds = convert_time_to_seconds(time_spent)
+                time_spent_hours = time_spent_seconds / 3600
+                time_spent_days = time_spent_seconds / (3600 * 8) # 8 hours to account for work-day only
+                time_spent_weeks = time_spent_seconds / (3600 * 8 * 5) # 5 days to account for work-week only
+                time_spent_months = time_spent_seconds / (3600 * 160)
+                time_spent_years = (time_spent_hours / 2000)
 
-                    inactive = "Yes" if "[X]" in author_name else "No"
+                inactive = "Yes" if "[X]" in author_name else "No"
 
-                    csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), safe_str(comment), safe_str(author_name), safe_str(time_spent), time_spent_seconds, time_spent_hours, time_spent_days, time_spent_weeks, time_spent_years, inactive, safe_str(worklog_created), safe_str(extraction_time)])
-            else:
-                csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), 'No work records found.', '', '', 0, 0, 0, 0, 0, 'No', '', safe_str(extraction_time)])
+                # Update the csv_writer.writerow() to include time_spent_months
+                csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), safe_str(comment), safe_str(author_name), safe_str(time_spent), time_spent_seconds, time_spent_hours, time_spent_days, time_spent_weeks, time_spent_months, time_spent_years, inactive, safe_str(worklog_created), safe_str(extraction_time)])
+        else:
+            csv_writer.writerow([safe_str(issue_key), safe_str(summary), safe_str(status), 'No work records found.', '', '', 0, 0, 0, 0, 0, 0, 'No', '', safe_str(extraction_time)])
 
 def process_tickets(url, username, token, project_key, start_range, end_range):
+
     jira = initialize_jira_connection(url, username, token)
 
     print(f"DEBUG: URL = {url}")
